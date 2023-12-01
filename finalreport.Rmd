@@ -1,0 +1,113 @@
+---
+title: "EuroCup Soccer"
+author: "Shu Liu"
+date: '`r Sys.Date()`'
+output:
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+```
+
+## EuroCup Soccer 
+
+This is Data in Motion data analysis challenge #2 More details click here [link](https://d-i-motion.com/lessons/challenge-2-eurocup-soccer/)
+
+### Scenario 
+
+You are a sports data analyst and you have been tasked with summarizing data from the matches from a previous EuroCup. Your manager would like the following questions answered.
+
+### Get the data
+Download dataset: Link to [dataset](https://raw.githubusercontent.com/guipsamora/pandas_exercises/master/02_Filtering_%26_Sorting/Euro12/Euro_2012_stats_TEAM.csv)
+
+### Challenge Questions
+>
+  1. How many teams participated in the Euro2012?
+  2. What is the number of columns in the dataset?
+  3. View only the columns Team, Yellow Cards and Red Cards and assign them to a dataframe called discipline.
+  4. Sort the teams by Red Cards, then to Yellow Cards.
+  5. Calculate the mean Yellow Cards given per Team.
+  6. Filter teams that scored more than 6 goals.
+  7. Select the teams that start with the letter G.
+  8. Select the first 7 columns.
+  9. Select all columns except the last 3.
+  10. Present only the Shooting Accuracy from England, Italy and Russia.
+
+## Steps
+### Set up environments
+Notes: install package "tidyverse" and "dplyr" for sorting and select.
+```{r set up environments}
+#an argument repos is added to the function that gives it the web address of the repository.
+install.packages("tidyverse", repos = "http://cran.us.r-project.org") 
+library(tidyverse)
+library(dplyr) #for sorting and select
+```
+### Load data
+Save the data set into local file directory. change working directory to where the file is. load the data into data frame eurocup_soccer.
+```{r change working directory}
+setwd("C:/Users/liuch/OneDrive/Documents/DataAnalytics/Portfolio/case_study_2")
+eurocup_soccer <- read_csv("Euro_2012_stats_TEAM.csv")
+```
+Now the eurocup_soccer has the data. Let's take a glimpse. 
+```{r glimpse the data}
+glimpse(eurocup_soccer)
+#check is there any missing values.I found 1 missing value.
+sum(is.na(eurocup_soccer)) 
+```
+### Analyze data and answer questions
+1. How many teams participated in the Euro2012?
+from the glimpse() above we can find out there are **16** teams participated in the Euro2012. 
+
+2. What is the number of columns in the dataset?
+From the glimpse() above we can find out there are **35** columns are in the dataset
+
+3. View only the columns Team, Yellow Cards and Red Cards and assign them to a dataframe called discipline.
+```{r view Team, Yellow Cards and Red Cards}
+descipline <- eurocup_soccer %>% select(Team,`Yellow Cards`,`Red Cards`)
+```
+
+4. Sort the teams by Red Cards, then to Yellow Cards.
+```{r sort}
+descipline %>% arrange(`Yellow Cards`, `Red Cards`)
+```
+
+5. Calculate the mean Yellow Cards given per Team.
+```{r calculate mean yellow cards }
+descipline %>% select(Team, `Yellow Cards`, `Red Cards`) %>% summarise(mean_yellor_cards=mean(`Yellow Cards`))
+```
+The mean Yellow Cards given per Team is **7.44**
+
+6. Filter teams that scored more than 6 goals.
+```{r filter by scores more than 6}
+eurocup_soccer %>% filter(Goals>6)
+```
+Only Germany and Spain have more than 6 goals.
+
+7. Select the teams that start with the letter G.
+We can use filter and subtr function
+```{r select team start with G}
+eurocup_soccer %>% filter(substr(Team,1,1)=="G")
+```
+Only Germany and Greece start with G.
+
+8. Select the first 7 columns.
+```{r select the first 7 columns}
+eurocup_soccer %>% select(1:7)
+```
+
+9. Select all columns except the last 3.
+```{r select all columns but last 3}
+eurocup_soccer %>% select(1:(ncol(eurocup_soccer) - 3))
+```
+
+10. Present only the Shooting Accuracy from England, Italy and Russia.
+```{r show Shooting Accuracy from England,Italy and Russia}
+teams_interests<-c("England","Italy","Russia") ## create a vector 
+## create a subdataset while Team in the vector teams_interests
+subdata_set <- eurocup_soccer %>% filter(Team %in% teams_interests) 
+##only select Team and Shooting Accuracy.
+subdata_set %>% select(Team, `Shooting Accuracy`) 
+```
+
+Notes. This dataset is small and clean. So it's easy to analyze. I also notice if there's space in the column name when we need to use it we need to add **backtitks \`** to quota it, such as **\`Yellow Cards\`**. 
